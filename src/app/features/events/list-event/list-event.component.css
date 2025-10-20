@@ -1,0 +1,245 @@
+/* Style général avec fond dégradé */
+.container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Titre principal */
+h2 {
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-size: 2.5rem;
+    margin-bottom: 2rem !important;
+}
+
+/* Barre de recherche */
+.form-control {
+    border: none;
+    border-radius: 25px;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.form-control:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    background: white;
+}
+
+/* Cartes d'événements */
+.card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Image des cartes */
+.card-img-top {
+    transition: transform 0.3s ease;
+    border-bottom: 3px solid #667eea;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.1);
+}
+
+/* Corps de la carte */
+.card-body {
+    padding: 1.5rem;
+    background: linear-gradient(to bottom, white, #f8f9fa);
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.text-muted {
+    color: #667eea !important;
+    font-weight: 600;
+}
+
+/* Boutons */
+.btn {
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    margin: 5px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover:not([disabled]) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.btn-danger:hover:not([disabled]) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
+.btn-details {
+    display: inline-block;
+    background: linear-gradient(45deg, #00b894, #00a085);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+    transition: all 0.3s ease;
+    margin: 5px;
+}
+
+.btn-details:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 184, 148, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+/* États désactivés */
+.btn:disabled {
+    opacity: 0.6;
+    transform: none !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+}
+
+/* Texte des prix et places */
+.card-body p {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.card-body strong {
+    color: #667eea;
+}
+
+/* États des dates */
+.text-danger {
+    color: #ff7675 !important;
+    font-weight: 600;
+}
+
+.text-success {
+    color: #00b894 !important;
+    font-weight: 600;
+}
+
+/* Animation d'apparition des cartes */
+.col-md-4 {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation delay pour chaque carte */
+.col-md-4:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.col-md-4:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.col-md-4:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.col-md-4:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.col-md-4:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.col-md-4:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+
+    .btn,
+    .btn-details {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+/* Effet de brillance sur les cartes */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent);
+    transition: left 0.5s;
+}
+
+.card:hover::before {
+    left: 100%;
+}
+
+
+

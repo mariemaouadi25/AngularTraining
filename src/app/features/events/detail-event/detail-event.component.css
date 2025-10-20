@@ -1,0 +1,137 @@
+/* === Mise en page principale === */
+.event-detail-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  background: #f3f6f8;
+  min-height: 100vh;
+}
+
+.event-card {
+  display: flex;
+  flex-wrap: wrap;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 900px;
+  transition: transform 0.3s ease;
+}
+
+.event-card:hover {
+  transform: scale(1.01);
+}
+
+/* === Image === */
+.event-image {
+  flex: 1 1 45%;
+  background: #000;
+}
+
+.event-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* === Infos === */
+.event-info {
+  flex: 1 1 55%;
+  padding: 30px;
+}
+
+.event-title {
+  font-size: 2rem;
+  color: #007b5e;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.event-description {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+/* === Détails === */
+.event-meta p {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.event-meta i {
+  color: #007b5e;
+  margin-right: 8px;
+}
+
+.available {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.full {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* === Boutons === */
+.event-actions {
+  margin-top: 25px;
+}
+
+.event-actions button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-like {
+  background: #ff4757;
+  color: white;
+}
+
+.btn-like:hover {
+  background: #e84118;
+}
+
+.btn-register {
+  background: #00a86b;
+  color: white;
+}
+
+.btn-register:hover {
+  background: #007b5e;
+}
+
+/* === Message d'erreur === */
+.not-found {
+  text-align: center;
+  padding: 50px;
+  color: #666;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .event-card {
+    flex-direction: column;
+  }
+
+  .event-info {
+    padding: 20px;
+  }
+
+  .event-title {
+    font-size: 1.6rem;
+  }
+
+  .event-description {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,44 @@
+<div class="event-detail-container" *ngIf="currentEvent; else notFound">
+  <div class="event-card">
+    <!-- 🖼️ Image -->
+    <div class="event-image">
+      <img
+        [src]="currentEvent.imageUrl"
+        alt="{{ currentEvent.title }}"
+      />
+    </div>
+
+    <!-- 📋 Informations -->
+    <div class="event-info">
+      <h2 class="event-title">{{ currentEvent.title }}</h2>
+      <p class="event-description">{{ currentEvent.description }}</p>
+
+      <div class="event-meta">
+        <p><i class="bi bi-calendar-event"></i> {{ currentEvent.date | date:'fullDate' }}</p>
+        <p><i class="bi bi-geo-alt"></i> {{ currentEvent.location }}</p>
+        <p><i class="bi bi-cash-coin"></i> {{ currentEvent.price }} DT</p>
+        <p>
+          <i class="bi bi-people"></i>
+          <strong>Places :</strong>
+          <span [ngClass]="{ 'available': currentEvent.nbPlaces > 0, 'full': currentEvent.nbPlaces === 0 }">
+            {{ currentEvent.nbPlaces > 0 ? currentEvent.nbPlaces + ' disponibles' : 'Complet' }}
+          </span>
+        </p>
+        <p><i class="bi bi-heart-fill text-danger"></i> {{ currentEvent.nbrLike }} J’aime</p>
+      </div>
+
+      <div class="event-actions">
+        <button class="btn-like">❤️ J'aime</button>
+        <button class="btn-register">📝 S'inscrire</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔹 Message si aucun événement trouvé -->
+<ng-template #notFound>
+  <div class="not-found">
+    <h3>🚫 Événement introuvable</h3>
+    <p>Vérifie l’identifiant ou retourne à la liste des événements.</p>
+  </div>
+</ng-template>
