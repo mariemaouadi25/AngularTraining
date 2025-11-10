@@ -1,0 +1,91 @@
+<div class="container mt-3">
+  <form [formGroup]="formRegister" (ngSubmit)="save()" novalidate>
+
+    <div class="form-group mb-2">
+      <label for="firstName">First Name</label>
+      <input id="firstName" type="text" class="form-control" formControlName="firstName">
+      <div class="alert alert-danger mt-1" *ngIf="formRegister.get('firstName')?.touched && formRegister.get('firstName')?.invalid">
+        <div *ngIf="formRegister.get('firstName')?.hasError('required')">This field is required.</div>
+        <div *ngIf="formRegister.get('firstName')?.hasError('minlength')">Please enter at least 3 characters.</div>
+      </div>
+    </div>
+
+    <div class="form-group mb-2">
+      <label for="lastName">Last Name</label>
+      <input id="lastName" type="text" class="form-control" formControlName="lastName">
+      <div class="alert alert-danger mt-1" *ngIf="formRegister.get('lastName')?.touched && formRegister.get('lastName')?.invalid">
+        <div *ngIf="formRegister.get('lastName')?.hasError('required')">This field is required.</div>
+        <div *ngIf="formRegister.get('lastName')?.hasError('minlength')">Please enter at least 3 characters.</div>
+      </div>
+    </div>
+
+    <div class="form-group mb-2">
+      <label for="email">Email</label>
+      <input id="email" type="email" class="form-control" formControlName="email">
+      <div class="alert alert-danger mt-1" *ngIf="formRegister.get('email')?.touched && formRegister.get('email')?.invalid">
+        <div *ngIf="formRegister.get('email')?.hasError('required')">Email is required.</div>
+        <div *ngIf="formRegister.get('email')?.hasError('pattern')">Invalid email.</div>
+      </div>
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="password">Password</label>
+      <input id="password" type="password" class="form-control" formControlName="password">
+      <div class="alert alert-danger mt-1" *ngIf="formRegister.get('password')?.touched && formRegister.get('password')?.invalid">
+        <div *ngIf="formRegister.get('password')?.hasError('required')">Password is required.</div>
+        <div *ngIf="formRegister.get('password')?.hasError('pattern')">Invalid password format.</div>
+      </div>
+    </div>
+
+    <fieldset class="border p-3 mb-3" formGroupName="address">
+      <legend class="w-auto px-2">Address</legend>
+
+      <div class="row g-2">
+        <div class="col-md-6">
+          <label for="street">Street</label>
+          <input id="street" type="text" class="form-control" formControlName="street">
+          <div class="alert alert-danger mt-1" *ngIf="formRegister.get('address.street')?.touched && formRegister.get('address.street')?.invalid">
+            Street invalid.
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="city">City</label>
+          <input id="city" type="text" class="form-control" formControlName="city">
+          <div class="alert alert-danger mt-1" *ngIf="formRegister.get('address.city')?.touched && formRegister.get('address.city')?.invalid">
+            City invalid.
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="state">State</label>
+          <input id="state" type="text" class="form-control" formControlName="state">
+          <div class="alert alert-danger mt-1" *ngIf="formRegister.get('address.state')?.touched && formRegister.get('address.state')?.invalid">
+            State invalid.
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="zip">Zip</label>
+          <input id="zip" type="text" class="form-control" formControlName="zip">
+          <div class="alert alert-danger mt-1" *ngIf="formRegister.get('address.zip')?.touched && formRegister.get('address.zip')?.invalid">
+            Zip invalid.
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <div formArrayName="phones" class="mb-3">
+      <label class="form-label d-block">Phone number(s)</label>
+
+      <div *ngFor="let ctrl of phonesArray.controls; let i = index" class="input-group mb-2">
+        <input class="form-control" type="text" [formControlName]="i">
+        <button type="button" class="btn btn-outline-secondary" (click)="removePhone(i)" [disabled]="phonesArray.length === 1">–</button>
+      </div>
+
+      <button type="button" class="btn btn-outline-primary" (click)="addPhone()">+ Add phone</button>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>

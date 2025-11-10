@@ -1,0 +1,89 @@
+<div class="event-form-container">
+
+  <h2 class="mb-4 title">Ajouter un Événement</h2>
+
+  <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+
+    <!-- Titre -->
+    <div class="mb-3">
+      <label class="form-label">Titre</label>
+      <input type="text"
+             class="form-control"
+             name="title"
+             [(ngModel)]="event.title"
+             required
+             minlength="3">
+      <div class="text-danger" *ngIf="f.submitted && f.controls['title']?.invalid">
+        Le titre est obligatoire (min 3 caractères).
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div class="mb-3">
+      <label class="form-label">Date</label>
+      <input type="date"
+             class="form-control"
+             name="date"
+             [(ngModel)]="event.date"
+             required>
+      <div class="text-danger" *ngIf="f.submitted && f.controls['date']?.invalid">
+        La date est obligatoire.
+      </div>
+    </div>
+
+    <!-- Prix -->
+    <div class="mb-3">
+      <label class="form-label">Prix</label>
+      <input type="number"
+             class="form-control"
+             name="price"
+             [(ngModel)]="event.price"
+             min="0"
+             required>
+      <div class="text-danger" *ngIf="f.submitted && f.controls['price']?.invalid">
+        Le prix doit être positif.
+      </div>
+    </div>
+
+    <!-- Lieu -->
+    <div class="mb-3">
+      <label class="form-label">Lieu</label>
+      <input type="text"
+             class="form-control"
+             name="place"
+             [(ngModel)]="event.place"
+             required>
+      <div class="text-danger" *ngIf="f.submitted && f.controls['place']?.invalid">
+        Le lieu est obligatoire.
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea class="form-control"
+                name="description"
+                rows="3"
+                [(ngModel)]="event.description"
+                required>
+      </textarea>
+      <div class="text-danger" *ngIf="f.submitted && f.controls['description']?.invalid">
+        La description est obligatoire.
+      </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+      <button class="btn btn-secondary" type="reset">Annuler</button>
+
+      <!-- ✅ Bouton désactivé si le formulaire est invalide -->
+      <button class="btn btn-primary"
+              type="submit"
+              [disabled]="f.invalid">
+        Ajouter
+      </button>
+    </div>
+
+  </form>
+
+</div>
