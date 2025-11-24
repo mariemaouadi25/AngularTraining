@@ -176,6 +176,7 @@ export class FormComponent implements OnInit {
       id_user: fb.id_user,
       id_event: fb.id_event,
       content: fb.content,
+      //f
       rate: fb.rate,
       date: fb.date
     };
