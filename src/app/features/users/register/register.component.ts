@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { User } from '../../../models/user';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {User} from '../../../models/user';
 
 @Component({
   selector: 'app-register',
@@ -8,58 +8,33 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
   styleUrl: './register.component.css'
 })
 export class RegisterComponent implements OnInit {
-  user!: User;
-  formRegister!: FormGroup;
-
-  private emailPattern = /^[a-z]+@[a-z]+\.[a-z]+$/i;
-  private passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-  private phonePattern = /^[0-9+()\-\s]{6,20}$/;
-  private zipPattern = /^[A-Za-z0-9\-\s]{3,10}$/;
-
-  constructor(private fb: FormBuilder) {}
-
-  ngOnInit(): void {
-    this.user = new User();
-
-    this.formRegister = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(3)]],
-      lastName: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.pattern(this.emailPattern)]],
-      password: ['', [Validators.required, Validators.pattern(this.passwordPattern)]],
-      address: this.fb.group({
-        street: ['', [Validators.required, Validators.minLength(3)]],
-        city: ['', [Validators.required, Validators.minLength(2)]],
-        state: ['', [Validators.required, Validators.minLength(2)]],
-        zip: ['', [Validators.required, Validators.pattern(this.zipPattern)]],
-      }),
-      phones: this.fb.array([this.createPhoneControl()])
-    });
-  }
-
-  private createPhoneControl(): FormControl {
-    return this.fb.control('', [Validators.required, Validators.pattern(this.phonePattern)]);
-  }
-
-  get phonesArray(): FormArray {
-    return this.formRegister.get('phones') as FormArray;
-  }
-
-  addPhone(): void {
-    this.phonesArray.push(this.createPhoneControl());
-  }
-
-  removePhone(index: number): void {
-    if (this.phonesArray.length > 1) {
-      this.phonesArray.removeAt(index);
+  gForm: FormGroup;
+  constructor() {
     }
-  }
-
-  save(): void {
-    if (this.formRegister.invalid) {
-      this.formRegister.markAllAsTouched();
-      return;
+    ngOnInit() {
+    this.gForm = new FormGroup({
+      firstName: new FormControl('',
+                    [Validators.required, Validators.minLength(3)]),
+      lastName: new FormControl('',
+                    [Validators.required, Validators.minLength(3)]),
+      email: new FormControl('',
+        [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/),Validators.minLength(8)]),
+      address: new FormGroup({
+        street: new FormControl('',[Validators.required, Validators.minLength(3)]),
+        city: new FormControl('',[Validators.required, Validators.minLength(3)]),
+        state: new FormControl('',[Validators.required, Validators.minLength(3)]),
+        zip: new FormControl('',[Validators.required, Validators.minLength(4)]),
+      })
+    })
     }
-    this.user = { ...this.user, ...this.formRegister.value };
-    console.log(this.user);
-  }
+  //1- pattern for the password a..zA..Z@&0..9 (8 charact)
+  //2-add the address ()
+  //3-phones[]
+
+    save(){
+    let user=this.gForm.getRawValue();
+    //user push service => backend
+      console.log(user)
+    }
 }
