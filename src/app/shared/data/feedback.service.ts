@@ -20,4 +20,20 @@ getFeedbacks() { return this.httpClient.get<Feedback[]>(this.urlBackend); }
 deleteFeedback(id: number) { return this.httpClient.delete(`${this.urlBackend}${id}`); }
 updateFeedback(fb: Feedback) { return this.httpClient.put<Feedback>(`${this.urlBackend}${fb.id}`, fb); }
 
+  public createFeedback(feedback:Feedback){
+    return this.httpClient.post<Feedback>(this.urlBackend,feedback);
+  } 
+
+  public getFeedbacks(){
+    return this.httpClient.get<Feedback[]>(this.urlBackend);
+  }
+
+  public deleteFeedback(id:number){
+    return this.httpClient.delete(this.urlBackend+id);
+
+  }
+
+  public updateFeedback(feedback:Feedback){
+    return this.httpClient.put(this.urlBackend+feedback.id,feedback);
+  }
 }

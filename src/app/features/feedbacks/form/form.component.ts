@@ -6,6 +6,8 @@ import { Feedback } from '../../../models/feedback';
 
 type EventsResponse = any[] | { events: any[] };
 
+import { Component } from '@angular/core';
+
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
@@ -235,4 +237,8 @@ export class FormComponent implements OnInit {
       date: new Date()
     };
   }
+  styleUrl: './form.component.css'
+})
+export class FormComponent {
+
 }
