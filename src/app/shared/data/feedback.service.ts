@@ -15,6 +15,11 @@ export class FeedbackService {
   }
 
   // etape 3 : preparer l'entite model sous le dossier model
+ createFeedback(fb: Feedback) { return this.httpClient.post<Feedback>(this.urlBackend, fb); }
+getFeedbacks() { return this.httpClient.get<Feedback[]>(this.urlBackend); }
+deleteFeedback(id: number) { return this.httpClient.delete(`${this.urlBackend}${id}`); }
+updateFeedback(fb: Feedback) { return this.httpClient.put<Feedback>(`${this.urlBackend}${fb.id}`, fb); }
+
   public createFeedback(feedback:Feedback){
     return this.httpClient.post<Feedback>(this.urlBackend,feedback);
   } 
