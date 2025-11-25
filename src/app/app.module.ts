@@ -9,6 +9,8 @@ import { HomeComponent } from './layout/home/home.component';
 import { NotFoundComponent } from './layout/not-found/not-found.component';
 import {ListEventComponent} from './features/events/list-event/list-event.component';
 import {FormsModule} from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // ✅ IMPORTANT
+
 import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
@@ -21,6 +23,8 @@ import {HttpClientModule} from '@angular/common/http';
   ],
   imports: [
     BrowserModule,
+        BrowserAnimationsModule,  // ✅ OBLIGATOIRE pour les animations
+
     AppRoutingModule,
     FormsModule,
     HttpClientModule,

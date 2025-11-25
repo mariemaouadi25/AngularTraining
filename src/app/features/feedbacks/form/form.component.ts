@@ -1,244 +1,151 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { FeedbackService } from '../../../shared/data/feedback.service';
-import { Feedback } from '../../../models/feedback';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { trigger, transition, style, animate } from '@angular/animations';
 
-type EventsResponse = any[] | { events: any[] };
-
-import { Component } from '@angular/core';
+interface Feedback {
+  id: string;
+  content: string;
+  rate: number;
+  date: string;
+  createdAt: Date;
+}
 
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
-  styleUrls: ['./form.component.css']
+  styleUrls: ['./form.component.css'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-20px)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(-20px)' }))
+      ])
+    ]),
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-20px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
+      ])
+    ])
+  ]
 })
 export class FormComponent implements OnInit {
+  feedbackForm!: FormGroup;
+  feedbacks: Feedback[] = [];
+  isSubmitting = false;
+  showSuccessMessage = false;
+  hoverRating = 0;
 
-  feedback: Feedback = {
-    id: 0,
-    id_user: 0,
-    id_event: 0,
-    content: '',
-    rate: 1,
-    date: new Date()
-  };
-
-  events: any[] = [];
-  allFeedbacks: Feedback[] = []; // liste locale de tous les feedbacks
-
-  // UI state
-  activeEventId: number | null = null;
-  showFormForEvent = false;
-  loading = false;
-
-  // édition inline
-  editingFeedbackId: number | null = null;
-  editedFeedback: Partial<Feedback> = {};
-
-  constructor(
-    private http: HttpClient,
-    private feedbackService: FeedbackService
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.loadEvents();
+    this.initForm();
     this.loadFeedbacks();
   }
 
-  /*************** chargements ***************/
-  private loadEvents(): void {
-    this.http.get<EventsResponse>('http://localhost:3000/events')
-      .subscribe({
-        next: res => {
-          if (Array.isArray(res)) {
-            this.events = res;
-          } else if (res && typeof res === 'object' && Array.isArray((res as any).events)) {
-            this.events = (res as { events: any[] }).events;
-          } else {
-            console.warn('Format de réponse /events inattendu', res);
-            this.events = [];
-          }
-        },
-        error: err => {
-          console.error('Erreur chargement events', err);
-          this.events = [];
-        }
-      });
+  initForm(): void {
+    this.feedbackForm = this.fb.group({
+      content: ['', [
+        Validators.required, 
+        Validators.minLength(10), 
+        Validators.maxLength(500)
+      ]],
+      rate: [null, [
+        Validators.required, 
+        Validators.min(1), 
+        Validators.max(5)
+      ]],
+      date: [this.getTodayDate(), Validators.required]
+    });
   }
 
-  private loadFeedbacks(): void {
-    this.feedbackService.getFeedbacks()
-      .subscribe({
-        next: (res: Feedback[]) => {
-          this.allFeedbacks = (res || []).map(f => ({
-            ...f,
-            date: f.date ? new Date(f.date) : new Date()
-          }));
-        },
-        error: err => {
-          console.error('Erreur chargement feedbacks', err);
-          this.allFeedbacks = [];
-        }
-      });
+  getTodayDate(): string {
+    return new Date().toISOString().split('T')[0];
   }
 
-  /*************** UI helpers ***************/
-  feedbacksForEvent(eventId: number): Feedback[] {
-    return this.allFeedbacks
-      .filter(f => Number(f.id_event) === Number(eventId))
-      .sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
+  loadFeedbacks(): void {
+    const stored = localStorage.getItem('eventfy_feedbacks');
+    if (stored) {
+      try {
+        this.feedbacks = JSON.parse(stored);
+      } catch (error) {
+        console.error('Erreur lors du chargement des feedbacks', error);
+        this.feedbacks = [];
+      }
+    }
   }
 
-  toggleComments(eventId: number): void {
-    if (this.activeEventId === eventId) {
-      this.activeEventId = null;
-      this.showFormForEvent = false;
-      this.cancelEdit();
+  saveFeedbacks(): void {
+    localStorage.setItem('eventfy_feedbacks', JSON.stringify(this.feedbacks));
+  }
+
+  setRating(rating: number): void {
+    this.feedbackForm.patchValue({ rate: rating });
+    this.feedbackForm.get('rate')?.markAsTouched();
+  }
+
+  onSubmit(): void {
+    if (this.feedbackForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
+
+      const newFeedback: Feedback = {
+        id: this.generateId(),
+        content: this.feedbackForm.value.content.trim(),
+        rate: this.feedbackForm.value.rate,
+        date: this.feedbackForm.value.date,
+        createdAt: new Date()
+      };
+
+      // Simuler un délai d'API (à remplacer par un vrai appel HTTP)
+      setTimeout(() => {
+        this.feedbacks.unshift(newFeedback);
+        this.saveFeedbacks();
+        
+        // Réinitialiser le formulaire
+        this.feedbackForm.reset({
+          content: '',
+          rate: null,
+          date: this.getTodayDate()
+        });
+        
+        // Marquer tous les champs comme non touchés
+        Object.keys(this.feedbackForm.controls).forEach(key => {
+          this.feedbackForm.get(key)?.markAsUntouched();
+          this.feedbackForm.get(key)?.markAsPristine();
+        });
+
+        this.isSubmitting = false;
+        this.showSuccessMessage = true;
+
+        // Masquer le message de succès après 3 secondes
+        setTimeout(() => {
+          this.showSuccessMessage = false;
+        }, 3000);
+      }, 500);
     } else {
-      this.activeEventId = eventId;
-      this.showFormForEvent = false;
-      this.cancelEdit();
-    }
-  }
-
-  openFormForActiveEvent(): void {
-    if (this.activeEventId == null) return;
-    this.resetLocal();
-    this.showFormForEvent = true;
-    this.feedback.id_event = this.activeEventId;
-  }
-
-  closeForm(): void {
-    this.showFormForEvent = false;
-    this.resetLocal();
-  }
-
-  /*************** soumission ajout ***************/
-  submitFeedback(form?: NgForm): void {
-    if (!this.activeEventId) {
-      alert('Aucun événement actif sélectionné.');
-      return;
-    }
-
-    if (!this.feedback.content || this.feedback.content.trim().length === 0) {
-      alert('Merci d\'écrire un message.');
-      return;
-    }
-
-    this.feedback.id_event = Number(this.activeEventId);
-    this.feedback.date = new Date();
-    this.feedback.id_user = Number(this.feedback.id_user) || 0;
-    this.feedback.rate = Number(this.feedback.rate) || 1;
-
-    this.loading = true;
-    this.feedbackService.createFeedback(this.feedback)
-      .subscribe({
-        next: (created: Feedback) => {
-          const normalized: Feedback = {
-            ...created,
-            date: created.date ? new Date(created.date) : new Date()
-          };
-
-          this.allFeedbacks = [normalized, ...this.allFeedbacks];
-          this.showFormForEvent = false;
-          if (form) form.resetForm();
-          this.resetLocal();
-          this.loading = false;
-        },
-        error: err => {
-          console.error('Erreur création feedback', err);
-          alert('Impossible d\'ajouter le feedback (voir console).');
-          this.loading = false;
-        }
+      // Marquer tous les champs comme touchés pour afficher les erreurs
+      Object.keys(this.feedbackForm.controls).forEach(key => {
+        this.feedbackForm.get(key)?.markAsTouched();
       });
-  }
-
-  /*************** suppression et modification (logique de ton autre code) ***************/
-  deleteFeedback(id: number | undefined): void {
-    if (id == null) return;
-    if (!confirm('Supprimer ce commentaire ? Cette action est irréversible.')) return;
-
-    this.feedbackService.deleteFeedback(Number(id))
-      .subscribe({
-        next: () => {
-          this.allFeedbacks = this.allFeedbacks.filter(f => f.id !== id);
-        },
-        error: err => {
-          console.error('Erreur suppression feedback', err);
-          alert('Impossible de supprimer le commentaire (voir console).');
-        }
-      });
-  }
-
-  startEdit(fb: Feedback): void {
-    this.editingFeedbackId = fb.id ?? null;
-    this.editedFeedback = {
-      id: fb.id,
-      id_user: fb.id_user,
-      id_event: fb.id_event,
-      content: fb.content,
-      //f
-      rate: fb.rate,
-      date: fb.date
-    };
-    this.activeEventId = Number(fb.id_event);
-    this.showFormForEvent = false;
-  }
-
-  cancelEdit(): void {
-    this.editingFeedbackId = null;
-    this.editedFeedback = {};
-  }
-
-  saveEdit(): void {
-    if (this.editingFeedbackId == null) return;
-    const id = this.editingFeedbackId;
-
-    const updated: Feedback = {
-      id: Number(this.editedFeedback.id ?? id),
-      id_user: Number(this.editedFeedback.id_user ?? 0),
-      id_event: Number(this.editedFeedback.id_event ?? this.activeEventId ?? 0),
-      content: String(this.editedFeedback.content ?? '').trim(),
-      rate: Number(this.editedFeedback.rate ?? 1),
-      date: new Date()
-    };
-
-    if (!updated.content) {
-      alert('Le commentaire ne peut pas être vide.');
-      return;
     }
-
-    this.feedbackService.updateFeedback(updated)
-      .subscribe({
-        next: res => {
-          const normalized: Feedback = {
-            ...updated,
-            date: res && res.date ? new Date(res.date) : updated.date
-          };
-          this.allFeedbacks = this.allFeedbacks.map(f => f.id === id ? normalized : f);
-          this.cancelEdit();
-        },
-        error: err => {
-          console.error('Erreur mise à jour feedback', err);
-          alert('Impossible de modifier le commentaire (voir console).');
-        }
-      });
   }
 
-  /*************** util ***************/
-  private resetLocal(): void {
-    this.feedback = {
-      id: 0,
-      id_user: 0,
-      id_event: this.activeEventId ?? 0,
-      content: '',
-      rate: 1,
-      date: new Date()
-    };
+  deleteFeedback(id: string): void {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce feedback ?')) {
+      this.feedbacks = this.feedbacks.filter(fb => fb.id !== id);
+      this.saveFeedbacks();
+    }
   }
-  styleUrl: './form.component.css'
-})
-export class FormComponent {
 
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.feedbackForm.get(fieldName);
+    return !!(field && field.invalid && field.touched);
+  }
+
+  generateId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
 }

@@ -1,83 +1,97 @@
-<div class="container-page">
-  <h1 class="page-title">Événements & commentaires</h1>
+<div class="container mt-5">
 
-  <div class="events-list">
-    <div class="event-card" *ngFor="let event of events">
-      <div class="event-left">
-        <img *ngIf="event.imageUrl" [src]="event.imageUrl" alt="{{event.title}}" />
-      </div>
+  <!-- Formulaire Feedback -->
+  <div class="card shadow-lg mx-auto mb-5" style="max-width: 600px; border-radius: 15px;">
+    <div class="card-body">
+      <h3 class="card-title text-center mb-4">Donner votre avis</h3>
 
-      <div class="event-right">
-        <h3>{{ event.title }}</h3>
-        <p class="meta">
-          <span>{{ event.location }}</span> • <span>{{ event.date }}</span>
-        </p>
-        <p class="desc">{{ event.description }}</p>
+      <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
 
-        <div class="actions">
-          <button class="btn-comment" (click)="toggleComments(event.id)">
-            {{ activeEventId === event.id ? 'Fermer commentaires' : 'Commenter' }}
-          </button>
+        <!-- Contenu -->
+        <div class="mb-3">
+          <label for="content" class="form-label fw-bold">Votre expérience</label>
+          <textarea
+            id="content"
+            class="form-control"
+            formControlName="content"
+            rows="4"
+            placeholder="Partagez votre expérience..."
+          ></textarea>
+
+          <!-- Messages d’erreur -->
+          <div class="text-danger mt-1 small"
+               *ngIf="feedbackForm.get('content')?.touched && feedbackForm.get('content')?.invalid">
+            <div *ngIf="feedbackForm.get('content')?.errors?.['required']">
+              Le commentaire est requis.
+            </div>
+            <div *ngIf="feedbackForm.get('content')?.errors?.['minlength']">
+              Le commentaire doit contenir au moins 10 caractères.
+            </div>
+          </div>
         </div>
 
-        <div class="comments-area" *ngIf="activeEventId === event.id">
-          <div class="comments-header">
-            <h4>Commentaires ({{ feedbacksForEvent(event.id).length }})</h4>
-            <button class="btn-add" (click)="openFormForActiveEvent()">Ajouter un commentaire</button>
-          </div>
+        <!-- Note -->
+        <div class="mb-3">
+          <label for="rate" class="form-label fw-bold">Note (1 à 5)</label>
+          <input
+            id="rate"
+            type="number"
+            min="1"
+            max="5"
+            class="form-control"
+            formControlName="rate"
+            placeholder="Donnez une note"
+          >
+        </div>
 
-          <!-- formulaire ajout -->
-          <div class="form-inline" *ngIf="showFormForEvent">
-            <form #feedbackForm="ngForm" (ngSubmit)="submitFeedback(feedbackForm)">
-              <div class="form-row">
-                <label for="id_user">Utilisateur (ID)</label>
-                <input type="number" id="id_user" name="id_user" [(ngModel)]="feedback.id_user" required />
-              </div>
+        <!-- Date -->
+        <div class="mb-3">
+          <label for="date" class="form-label fw-bold">Date</label>
+          <input
+            id="date"
+            type="date"
+            class="form-control"
+            formControlName="date"
+          >
+        </div>
 
-              <div class="form-row">
-                <label for="content">Message</label>
-                <textarea id="content" name="content" rows="3" [(ngModel)]="feedback.content" placeholder="Écrire votre commentaire..." required></textarea>
-              </div>
+        <!-- Bouton Envoyer -->
+        <button
+          type="submit"
+          class="btn btn-gradient w-100 py-2"
+          [disabled]="feedbackForm.invalid"
+        >
+          <i class="bi bi-send-fill me-2"></i> Envoyer
+        </button>
 
-              <div class="form-row inline">
-                <div class="small">
-                  <label for="rate">Note</label>
-                  <input type="number" id="rate" name="rate" min="1" max="5" [(ngModel)]="feedback.rate" required />
-                </div>
-                <div class="small">
-                  <label>Date</label>
-                  <input type="text" [value]="(feedback.date | date:'short')" readonly />
-                </div>
-              </div>
+      </form>
+    </div>
+  </div>
 
-              <div class="form-actions">
-                <button type="submit" class="btn-submit" [disabled]="loading">{{ loading ? 'Envoi...' : 'Envoyer' }}</button>
-                <button type="button" class="btn-cancel" (click)="closeForm()" [disabled]="loading">Annuler</button>
-              </div>
-            </form>
-          </div>
+  <!-- Liste des Feedbacks -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-md-8" *ngIf="feedbacks && feedbacks.length > 0">
 
-          <!-- liste des commentaires -->
-          <div class="comments-list">
-            <div class="comment-item" *ngFor="let fb of feedbacksForEvent(event.id)">
-              <div *ngIf="editingFeedbackId !== fb.id">
-                <div class="comment-meta">
-                  <strong>Utilisateur #{{ fb.id_user }}</strong>
-                  <span class="date">{{ fb.date | date:'short' }}</span>
-                  <span class="rate">★ {{ fb.rate }}</span>
-                </div>
-                <div class="comment-body">{{ fb.content }}</div>
-                <div class="comment-actions">
-                  <button class="btn-edit" (click)="startEdit(fb)">Modifier</button>
-                  <button class="btn-delete" (click)="deleteFeedback(fb.id)">Supprimer</button>
-                </div>
-              </div>
+      <h4 class="mb-4 text-center">Liste des Feedbacks</h4>
 
-              <div *ngIf="editingFeedbackId === fb.id" class="edit-block">
-                <div class="form-row">
-                  <label>Modifier le message</label>
-                  <textarea [(ngModel)]="editedFeedback.content" name="editedContent{{fb.id}}" rows="3"></textarea>
-                </div>
-                <div class="form-row inline">
-                  <div class="small">
-<p>form works!</p>
+      <div *ngFor="let fb of feedbacks" class="card mb-3 shadow-sm border-0">
+        <div class="card-body bg-light rounded-3">
+          <p class="mb-1"><strong>Commentaire :</strong> {{ fb.content }}</p>
+          <p class="mb-1">
+            <strong>Note :</strong>
+            <span *ngFor="let star of [].constructor(fb.rate)">⭐</span>
+            <span *ngFor="let empty of [].constructor(5 - fb.rate)">☆</span>
+          </p>
+          <p class="mb-0 text-muted"><strong>Date :</strong> {{ fb.date | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Message si aucun feedback -->
+  <div class="text-center text-muted" *ngIf="feedbacks && feedbacks.length === 0">
+    Aucun feedback pour le moment.
+  </div>
+
+</div>
