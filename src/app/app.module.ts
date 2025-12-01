@@ -12,22 +12,26 @@ import {FormsModule} from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // ✅ IMPORTANT
 
 import {HttpClientModule} from '@angular/common/http';
+import { CardComponent } from './layout/Card/card.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     FooterComponent,
-    HomeComponent,
     NotFoundComponent,
+
+
+
   ],
   imports: [
     BrowserModule,
-        BrowserAnimationsModule,  // ✅ OBLIGATOIRE pour les animations
+    BrowserAnimationsModule,  // ✅ OBLIGATOIRE pour les animations
 
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    HomeComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

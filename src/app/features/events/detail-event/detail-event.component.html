@@ -1,6 +1,5 @@
 <div class="event-detail-container" *ngIf="currentEvent; else notFound">
   <div class="event-card shadow-sm p-3 rounded">
-
     <div class="event-image mb-3 text-center">
       <img
         [src]="currentEvent.imageUrl || 'assets/default-event.jpg'"
@@ -38,7 +37,7 @@
       </div>
     </div>
 
-    <!-- 🔹 Boutons d’action -->
+    <!-- Boutons d’action -->
     <div class="event-actions mt-3 d-flex gap-2">
       <button class="btn btn-primary" [disabled]="currentEvent.nbPlaces === 0">
         Réserver
@@ -50,14 +49,15 @@
         Comment
       </a>
     </div>
-
   </div>
 </div>
 
-<!-- 🔹 Message si aucun événement trouvé -->
 <ng-template #notFound>
   <div class="not-found text-center p-5">
     <h3>🚫 Événement introuvable</h3>
     <p>Vérifie l’identifiant ou retourne à la liste des événements.</p>
   </div>
 </ng-template>
+
+
+

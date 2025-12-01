@@ -3,27 +3,21 @@
   <!-- Formulaire Feedback -->
   <div class="card shadow-lg mx-auto mb-5" style="max-width: 600px; border-radius: 15px;">
     <div class="card-body">
-      <h3 class="card-title text-center mb-4">Donner votre avis</h3>
+
+      <h3 class="card-title text-center mb-4">
+        Donner votre avis sur : <strong>{{ currentEvent?.title }}</strong>
+      </h3>
 
       <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
 
         <!-- Contenu -->
         <div class="mb-3">
-          <label for="content" class="form-label fw-bold">Votre expérience</label>
-          <textarea
-            id="content"
-            class="form-control"
-            formControlName="content"
-            rows="4"
-            placeholder="Partagez votre expérience..."
-          ></textarea>
+          <label class="form-label fw-bold">Votre expérience</label>
+          <textarea class="form-control" rows="4" formControlName="content"
+                    placeholder="Partagez votre expérience..."></textarea>
 
-          <!-- Messages d’erreur -->
-          <div class="text-danger mt-1 small"
-               *ngIf="feedbackForm.get('content')?.touched && feedbackForm.get('content')?.invalid">
-            <div *ngIf="feedbackForm.get('content')?.errors?.['required']">
-              Le commentaire est requis.
-            </div>
+          <div class="text-danger mt-1 small" *ngIf="isFieldInvalid('content')">
+            <div *ngIf="feedbackForm.get('content')?.errors?.['required']">Le commentaire est requis.</div>
             <div *ngIf="feedbackForm.get('content')?.errors?.['minlength']">
               Le commentaire doit contenir au moins 10 caractères.
             </div>

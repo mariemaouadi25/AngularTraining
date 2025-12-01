@@ -12,6 +12,12 @@ interface Feedback {
 
 @Component({
   selector: 'app-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    CardComponent
+  ],
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.css'],
   animations: [

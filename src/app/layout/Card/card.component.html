@@ -1,0 +1,39 @@
+<div class="card h-100 shadow-sm event-card d-flex flex-column">
+  <img [src]="event.imageUrl" class="card-img-top" alt="{{ event.title }}">
+
+  <div class="card-body d-flex flex-column">
+    <!-- Titre + Likes -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="card-title mb-0" 
+          [ngClass]="{'text-danger': event.nbPlaces === 0, 'text-success': event.nbPlaces > 0}">
+        {{ event.title }}
+      </h5>
+      <span class="badge bg-light text-dark">👍 {{ event.nbrLike }}</span>
+    </div>
+
+    <p class="text-muted mb-1">Prix : <strong>{{ event.price | currency:'USD':'symbol' }}</strong></p>
+    <p class="mb-1">Lieu : {{ event.location }}</p>
+    <p class="fw-bold mb-2">Places restantes : {{ event.nbPlaces }}</p>
+    <p class="card-text mb-3">{{ event.description }}</p>
+
+    <div class="mt-auto d-grid gap-2">
+      <button class="btn btn-sm" 
+              [ngClass]="event.nbrLike >= 5 ? 'btn-danger' : 'btn-warning'" 
+              (click)="nbrLike(event)">
+        👍 Like {{ event.nbrLike }}
+      </button>
+
+      <button class="btn btn-sm btn-primary" 
+              [disabled]="event.nbPlaces === 0" 
+              (click)="nbrPlaceDecr(event)">
+        Buy Ticket
+      </button>
+
+      <a [routerLink]="['./details', event.id]" class="btn btn-outline-primary btn-sm">
+        More Details
+      </a>
+    </div>
+
+    <small class="text-muted mt-2">{{ event.date | date:'mediumDate' }}</small>
+  </div>
+</div>
