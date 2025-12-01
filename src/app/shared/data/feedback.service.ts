@@ -1,39 +1,45 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Feedback } from '../../models/feedback';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FeedbackService {
-  // etape 0 : import de httpClientModule dans appModule
-  // etape 1 : define the urlBackend 
-  urlBackend="http://localhost:3000/feedbacks/";
-  // etape 2 : inject the httpClientService
-  constructor(private httpClient:HttpClient) { 
 
+  private urlBackend = 'http://localhost:3000/feedbacks';
+
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+  };
+
+  constructor(private http: HttpClient) {}
+
+  getAllFeedbacks(): Observable<Feedback[]> {
+    return this.http.get<Feedback[]>(this.urlBackend);
   }
 
-  // etape 3 : preparer l'entite model sous le dossier model
- createFeedback(fb: Feedback) { return this.httpClient.post<Feedback>(this.urlBackend, fb); }
-getFeedbacks() { return this.httpClient.get<Feedback[]>(this.urlBackend); }
-deleteFeedback(id: number) { return this.httpClient.delete(`${this.urlBackend}${id}`); }
-updateFeedback(fb: Feedback) { return this.httpClient.put<Feedback>(`${this.urlBackend}${fb.id}`, fb); }
-
-  public createFeedback(feedback:Feedback){
-    return this.httpClient.post<Feedback>(this.urlBackend,feedback);
-  } 
-
-  public getFeedbacks(){
-    return this.httpClient.get<Feedback[]>(this.urlBackend);
+  getFeedbackById(id: string): Observable<Feedback> {
+    return this.http.get<Feedback>(`${this.urlBackend}/${id}`);
   }
 
-  public deleteFeedback(id:number){
-    return this.httpClient.delete(this.urlBackend+id);
-
+  addFeedback(fb: Feedback): Observable<Feedback> {
+    return this.http.post<Feedback>(this.urlBackend, fb, this.httpOptions);
   }
 
-  public updateFeedback(feedback:Feedback){
-    return this.httpClient.put(this.urlBackend+feedback.id,feedback);
+  updateFeedback(id: string, fb: Feedback): Observable<Feedback> {
+    return this.http.put<Feedback>(`${this.urlBackend}/${id}`, fb, this.httpOptions);
+  }
+
+  deleteFeedback(id: string): Observable<any> {
+    return this.http.delete(`${this.urlBackend}/${id}`, this.httpOptions);
+  }
+
+  // 🔹 Méthode pour récupérer les feedbacks d'un événement spécifique
+  getFeedbacksByEvent(eventId: number): Observable<Feedback[]> {
+    return this.http.get<Feedback[]>(`${this.urlBackend}?id_event=${eventId}`);
   }
 }
