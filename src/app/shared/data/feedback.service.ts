@@ -37,9 +37,4 @@ export class FeedbackService {
   deleteFeedback(id: string): Observable<any> {
     return this.http.delete(`${this.urlBackend}/${id}`, this.httpOptions);
   }
-
-  // 🔹 Méthode pour récupérer les feedbacks d'un événement spécifique
-  getFeedbacksByEvent(eventId: number): Observable<Feedback[]> {
-    return this.http.get<Feedback[]>(`${this.urlBackend}?id_event=${eventId}`);
-  }
 }

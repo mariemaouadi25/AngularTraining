@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { CardComponent } from '../../../layout/Card/card.component';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import {Eventy} from '../../../models/eventy';
-import {EventsService} from '../../../shared/data/events.service';
 
 interface Feedback {
   id: string;
@@ -13,7 +8,6 @@ interface Feedback {
   rate: number;
   date: string;
   createdAt: Date;
-  eventId: number;
 }
 
 @Component({
@@ -35,35 +29,41 @@ interface Feedback {
       transition(':leave', [
         animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(-20px)' }))
       ])
+    ]),
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-20px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
+      ])
     ])
   ]
 })
 export class FormComponent implements OnInit {
-
   feedbackForm!: FormGroup;
   feedbacks: Feedback[] = [];
-  currentEvent!: Eventy;
-  samePlaceEvents: Eventy[] = [];
-allEvents: Eventy[] = [];
-  showSuccessMessage = false;
   isSubmitting = false;
+  showSuccessMessage = false;
+  hoverRating = 0;
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private eventsService: EventsService
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.initForm();
-    this.loadCurrentEvent();
-    this.loadAllEvents();
+    this.loadFeedbacks();
   }
 
   initForm(): void {
     this.feedbackForm = this.fb.group({
-      content: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
-      rate: [1, [Validators.required, Validators.min(1), Validators.max(5)]],
+      content: ['', [
+        Validators.required, 
+        Validators.minLength(10), 
+        Validators.maxLength(500)
+      ]],
+      rate: [null, [
+        Validators.required, 
+        Validators.min(1), 
+        Validators.max(5)
+      ]],
       date: [this.getTodayDate(), Validators.required]
     });
   }
@@ -72,72 +72,78 @@ allEvents: Eventy[] = [];
     return new Date().toISOString().split('T')[0];
   }
 
-  /* Charger événement courant et feedbacks */
-  loadCurrentEvent(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.eventsService.getEventById(id).subscribe((event: Eventy) => {
-      this.currentEvent = event;
-      this.loadFeedbacks(event.id);
-
-      this.eventsService.getAllEvents().subscribe((all: Eventy[]) => {
-        this.samePlaceEvents = all.filter(e =>
-          e.location === event.location && e.id !== event.id
-        );
-      });
-    });
-  }
-
-  loadAllEvents(): void {
-    this.eventsService.getAllEvents().subscribe((all: Eventy[]) => {
-      this.allEvents = all;
-    });
-  }
-
-  loadFeedbacks(eventId: number): void {
+  loadFeedbacks(): void {
     const stored = localStorage.getItem('eventfy_feedbacks');
     if (stored) {
-      const all = JSON.parse(stored) as Feedback[];
-      this.feedbacks = all.filter(f => f.eventId === eventId);
+      try {
+        this.feedbacks = JSON.parse(stored);
+      } catch (error) {
+        console.error('Erreur lors du chargement des feedbacks', error);
+        this.feedbacks = [];
+      }
     }
   }
 
   saveFeedbacks(): void {
-    const stored = localStorage.getItem('eventfy_feedbacks');
-    let all: Feedback[] = stored ? JSON.parse(stored) : [];
-    all = all.filter(f => f.eventId !== this.currentEvent.id);
-    all.push(...this.feedbacks);
-    localStorage.setItem('eventfy_feedbacks', JSON.stringify(all));
+    localStorage.setItem('eventfy_feedbacks', JSON.stringify(this.feedbacks));
+  }
+
+  setRating(rating: number): void {
+    this.feedbackForm.patchValue({ rate: rating });
+    this.feedbackForm.get('rate')?.markAsTouched();
   }
 
   onSubmit(): void {
-    if (!this.feedbackForm.valid || this.isSubmitting) {
-      this.markAllAsTouched();
-      return;
+    if (this.feedbackForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
+
+      const newFeedback: Feedback = {
+        id: this.generateId(),
+        content: this.feedbackForm.value.content.trim(),
+        rate: this.feedbackForm.value.rate,
+        date: this.feedbackForm.value.date,
+        createdAt: new Date()
+      };
+
+      // Simuler un délai d'API (à remplacer par un vrai appel HTTP)
+      setTimeout(() => {
+        this.feedbacks.unshift(newFeedback);
+        this.saveFeedbacks();
+        
+        // Réinitialiser le formulaire
+        this.feedbackForm.reset({
+          content: '',
+          rate: null,
+          date: this.getTodayDate()
+        });
+        
+        // Marquer tous les champs comme non touchés
+        Object.keys(this.feedbackForm.controls).forEach(key => {
+          this.feedbackForm.get(key)?.markAsUntouched();
+          this.feedbackForm.get(key)?.markAsPristine();
+        });
+
+        this.isSubmitting = false;
+        this.showSuccessMessage = true;
+
+        // Masquer le message de succès après 3 secondes
+        setTimeout(() => {
+          this.showSuccessMessage = false;
+        }, 3000);
+      }, 500);
+    } else {
+      // Marquer tous les champs comme touchés pour afficher les erreurs
+      Object.keys(this.feedbackForm.controls).forEach(key => {
+        this.feedbackForm.get(key)?.markAsTouched();
+      });
     }
-
-    this.isSubmitting = true;
-    const newFeedback: Feedback = {
-      id: Date.now().toString(36) + Math.random().toString(36).substring(2),
-      content: this.feedbackForm.value.content.trim(),
-      rate: this.feedbackForm.value.rate,
-      date: this.feedbackForm.value.date,
-      createdAt: new Date(),
-      eventId: this.currentEvent.id
-    };
-
-    setTimeout(() => {
-      this.feedbacks.unshift(newFeedback);
-      this.saveFeedbacks();
-      this.feedbackForm.reset({ content: '', rate: 1, date: this.getTodayDate() });
-      this.isSubmitting = false;
-      this.showSuccessMessage = true;
-      setTimeout(() => this.showSuccessMessage = false, 3000);
-    }, 300);
   }
 
   deleteFeedback(id: string): void {
-    this.feedbacks = this.feedbacks.filter(f => f.id !== id);
-    this.saveFeedbacks();
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce feedback ?')) {
+      this.feedbacks = this.feedbacks.filter(fb => fb.id !== id);
+      this.saveFeedbacks();
+    }
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -145,13 +151,7 @@ allEvents: Eventy[] = [];
     return !!(field && field.invalid && field.touched);
   }
 
-  markAllAsTouched(): void {
-    Object.keys(this.feedbackForm.controls).forEach(key => {
-      this.feedbackForm.get(key)?.markAsTouched();
-    });
-  }
-
-  createArray(n: number): number[] {
-    return Array.from({ length: n }, (_, i) => i);
+  generateId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 }

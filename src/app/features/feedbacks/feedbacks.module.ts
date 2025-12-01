@@ -7,6 +7,7 @@ import { FeedbacksRoutingModule } from './feedbacks-routing.module';
 import { FeedbacksComponent } from './feedbacks.component';
 import { FormComponent } from './form/form.component';  // composant classique
 
+
 @NgModule({
   declarations: [
     FeedbacksComponent// ✅ déclarer le composant ici, pas dans imports
@@ -17,6 +18,7 @@ import { FormComponent } from './form/form.component';  // composant classique
     FormsModule,
     ReactiveFormsModule,
     FormComponent
+    ReactiveFormsModule  // ✅ Nécessaire pour les formulaires réactifs
   ]
 })
 export class FeedbacksModule { }

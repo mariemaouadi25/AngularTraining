@@ -26,73 +26,66 @@
 
         <!-- Note -->
         <div class="mb-3">
-          <label class="form-label fw-bold">Note (1 à 5)</label>
-          <input type="number" class="form-control" min="1" max="5" formControlName="rate">
+          <label for="rate" class="form-label fw-bold">Note (1 à 5)</label>
+          <input
+            id="rate"
+            type="number"
+            min="1"
+            max="5"
+            class="form-control"
+            formControlName="rate"
+            placeholder="Donnez une note"
+          >
         </div>
 
         <!-- Date -->
         <div class="mb-3">
-          <label class="form-label fw-bold">Date</label>
-          <input type="date" class="form-control" formControlName="date">
+          <label for="date" class="form-label fw-bold">Date</label>
+          <input
+            id="date"
+            type="date"
+            class="form-control"
+            formControlName="date"
+          >
         </div>
 
-        <!-- Bouton -->
-        <button type="submit" class="btn btn-primary w-100 py-2"
-                [disabled]="feedbackForm.invalid">
-          Envoyer
+        <!-- Bouton Envoyer -->
+        <button
+          type="submit"
+          class="btn btn-gradient w-100 py-2"
+          [disabled]="feedbackForm.invalid"
+        >
+          <i class="bi bi-send-fill me-2"></i> Envoyer
         </button>
 
-        <div *ngIf="showSuccessMessage" class="text-success mt-2 text-center">
-          Feedback ajouté avec succès !
-        </div>
       </form>
     </div>
   </div>
 
-  <!-- Liste des feedbacks -->
-  <div class="row justify-content-center mb-5" *ngIf="feedbacks.length > 0">
-    <div class="col-md-8">
-      <h4 class="mb-4 text-center">Avis des utilisateurs</h4>
+  <!-- Liste des Feedbacks -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-md-8" *ngIf="feedbacks && feedbacks.length > 0">
 
-      <div *ngFor="let fb of feedbacks" class="card mb-3 shadow-sm border-0" [@fadeInOut]>
+      <h4 class="mb-4 text-center">Liste des Feedbacks</h4>
+
+      <div *ngFor="let fb of feedbacks" class="card mb-3 shadow-sm border-0">
         <div class="card-body bg-light rounded-3">
-
-          <p><strong>Commentaire :</strong> {{ fb.content }}</p>
-
-          <p>
+          <p class="mb-1"><strong>Commentaire :</strong> {{ fb.content }}</p>
+          <p class="mb-1">
             <strong>Note :</strong>
-            <ng-container *ngFor="let s of createArray(fb.rate)">⭐</ng-container>
-            <ng-container *ngFor="let e of createArray(5 - fb.rate)">☆</ng-container>
+            <span *ngFor="let star of [].constructor(fb.rate)">⭐</span>
+            <span *ngFor="let empty of [].constructor(5 - fb.rate)">☆</span>
           </p>
-
-          <p class="text-muted">
-            <strong>Date :</strong> {{ fb.date | date:'dd/MM/yyyy' }}
-          </p>
-
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-sm btn-outline-danger"
-                    (click)="deleteFeedback(fb.id)">
-              Supprimer
-            </button>
-          </div>
+          <p class="mb-0 text-muted"><strong>Date :</strong> {{ fb.date | date:'dd/MM/yyyy' }}</p>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Événements du même lieu -->
-  <div class="mt-5" *ngIf="samePlaceEvents.length > 0">
-    <h4 class="text-center mb-4">
-      Autres événements à {{ currentEvent.location }}
-    </h4>
-
-    <div class="row">
-      <div class="col-md-4 mb-3" *ngFor="let event of samePlaceEvents">
-        <app-card [event]="event"></app-card>
-      </div>
-    </div>
+  <!-- Message si aucun feedback -->
+  <div class="text-center text-muted" *ngIf="feedbacks && feedbacks.length === 0">
+    Aucun feedback pour le moment.
   </div>
-
-  
 
 </div>
